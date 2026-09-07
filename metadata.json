@@ -1,0 +1,6 @@
+{
+  "name": "Contact List Creator",
+  "description": "Tool upload file Excel, validate 3 cột ID, Name, Email và tạo Google Sheet trong thư mục Google Drive qua Google Apps Script.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
