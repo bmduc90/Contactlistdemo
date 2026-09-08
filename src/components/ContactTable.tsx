@@ -77,24 +77,24 @@ export function ContactTable({
     <div id="contact-table-section" className="w-full bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs mb-6">
       {/* Table Header Bar with Search & Pagination info */}
       <div className="p-4 border-b border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="relative w-full sm:w-72">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+        <div className="relative w-full sm:w-64">
+          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
           <input
             type="text"
             id="search-contact-input"
-            placeholder="Tìm theo ID, Tên hoặc Email..."
+            placeholder="Tìm kiếm..."
             value={searchTerm}
             onChange={(e) => {
               setSearchTerm(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-full pl-9 pr-3 py-1.5 text-xs bg-white border border-slate-300 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500"
+            className="w-full pl-8 pr-3 py-1.5 text-xs bg-white border border-slate-300 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-emerald-500"
           />
         </div>
 
         <div className="flex items-center gap-3 text-xs text-slate-500">
           <span>
-            Hiển thị <strong>{filteredContacts.length}</strong> / {contacts.length} liên hệ
+            {filteredContacts.length} / {contacts.length}
           </span>
 
           {totalPages > 1 && (
@@ -130,19 +130,19 @@ export function ContactTable({
         <table className="w-full text-left text-xs text-slate-700">
           <thead className="bg-slate-100/75 text-slate-700 uppercase font-semibold text-[11px] tracking-wider border-b border-slate-200">
             <tr>
-              <th className="py-2.5 px-3 w-12 text-center">#</th>
-              <th className="py-2.5 px-4 w-28">ID</th>
-              <th className="py-2.5 px-4 w-44">Name (Họ tên)</th>
-              <th className="py-2.5 px-4">Email</th>
-              <th className="py-2.5 px-4 w-60">Status (Vấn đề ghi nhận)</th>
-              <th className="py-2.5 px-3 w-20 text-center">Thao tác</th>
+              <th className="py-2 px-3 w-12 text-center">#</th>
+              <th className="py-2 px-4 w-28">ID</th>
+              <th className="py-2 px-4 w-44">Tên</th>
+              <th className="py-2 px-4">Email</th>
+              <th className="py-2 px-4 w-52">Trạng thái</th>
+              <th className="py-2 px-3 w-20 text-center">Thao tác</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200">
             {paginatedContacts.length === 0 ? (
               <tr>
                 <td colSpan={6} className="py-8 text-center text-slate-400">
-                  Không tìm thấy liên hệ nào phù hợp với bộ lọc hiện tại.
+                  Không có dữ liệu
                 </td>
               </tr>
             ) : (

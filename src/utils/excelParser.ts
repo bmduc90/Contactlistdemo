@@ -103,21 +103,16 @@ export async function parseExcelFile(file: File): Promise<ParseExcelResult> {
 
 export function downloadSampleExcel() {
   const sampleData = [
-    { ID: 'KH001', Name: 'Nguyễn Văn An', Email: 'nguyen.an@company.com' },
-    { ID: 'KH002', Name: 'Trần Thị Bình', Email: 'tranbinh92@gmail.com' },
-    { ID: 'KH003', Name: 'Lê Hoàng Cường', Email: 'cuong.le@startup.vn' },
-    { ID: 'KH004', Name: 'Phạm Minh Đức', Email: 'ducbm90@gmail.com' },
-    { ID: 'KH005', Name: 'Võ Thị Hoa', Email: 'hoa.vo@enterprise.com' },
-    { ID: 'KH006', Name: 'Đặng Quốc Huy', Email: 'dangquochuy@example.org' },
-    { ID: 'KH007', Name: '', Email: 'missing.name@test.com' }, // Example invalid row (missing name)
-    { ID: 'KH008', Name: 'Nguyễn Văn Minh', Email: 'email-sai-dinh-dang' }, // Example invalid row (bad email)
+    { ID: '1', Name: 'Bùi Minh Đức', Email: 'ducbm90@gmail.com' },
+    { ID: '2', Name: 'Nguyễn Văn An', Email: 'nguyen.an@company.com' },
+    { ID: '3', Name: 'Trần Thị Bình', Email: 'tranbinh92@gmail.com' },
   ];
 
   const worksheet = XLSX.utils.json_to_sheet(sampleData);
 
   // Set column widths
   worksheet['!cols'] = [
-    { wch: 15 }, // ID
+    { wch: 10 }, // ID
     { wch: 25 }, // Name
     { wch: 30 }, // Email
   ];
@@ -155,6 +150,80 @@ export function exportContactsToExcel(
 
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, 'ContactList');
+
+  XLSX.writeFile(workbook, filename.endsWith('.xlsx') ? filename : `${filename}.xlsx`);
+}
+
+export function exportMappedContactsToExcel(
+  contacts: { id: string; name: string; email: string; imageUrl?: string; hasImage?: boolean }[],
+  filename: string
+) {
+  const exportData = contacts.map((c) => ({
+    ID: c.id,
+    Name: c.name,
+    Email: c.email,
+    img: c.imageUrl || '',
+    'Trạng thái': c.hasImage || Boolean(c.imageUrl) ? 'Đã ghép ảnh' : 'Chưa có ảnh',
+  }));
+
+  const worksheet = XLSX.utils.json_to_sheet(exportData);
+  worksheet['!cols'] = [
+    { wch: 15 },
+    { wch: 25 },
+    { wch: 32 },
+    { wch: 50 },
+    { wch: 18 },
+  ];
+
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'MappedContacts');
+
+  XLSX.writeFile(workbook, filename.endsWith('.xlsx') ? filename : `${filename}.xlsx`);
+}
+
+export function exportFullMappedRowsToExcel(
+  rawRows: Record<string, any>[],
+  headers: string[],
+  idKey: string,
+  imageMap: Record<string, string>,
+  filename: string
+) {
+  const exportData = rawRows.map((row) => {
+    const newRow: Record<string, any> = {};
+    const rawId = String(row[idKey] ?? '').trim();
+    let imgUrl = '';
+    if (rawId) {
+      imgUrl =
+        imageMap[rawId] ||
+        imageMap[rawId.toLowerCase()] ||
+        imageMap[rawId.toUpperCase()] ||
+        '';
+      if (!imgUrl) {
+        const unp = rawId.replace(/^0+/, '');
+        if (unp) imgUrl = imageMap[unp] || imageMap[unp.toLowerCase()] || '';
+      }
+    }
+
+    let imgPlaced = false;
+    headers.forEach((h) => {
+      newRow[h] = row[h] ?? '';
+      const hLower = h.trim().toLowerCase();
+      if (hLower === 'email' || hLower.includes('email')) {
+        newRow['img'] = imgUrl;
+        imgPlaced = true;
+      }
+    });
+
+    if (!imgPlaced) {
+      newRow['img'] = imgUrl;
+    }
+
+    return newRow;
+  });
+
+  const worksheet = XLSX.utils.json_to_sheet(exportData);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Contact List');
 
   XLSX.writeFile(workbook, filename.endsWith('.xlsx') ? filename : `${filename}.xlsx`);
 }

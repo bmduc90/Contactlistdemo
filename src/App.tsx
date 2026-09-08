@@ -11,6 +11,7 @@ import { Step2ImageScanner } from './components/Step2ImageScanner';
 import { Step3ExportContactList } from './components/Step3ExportContactList';
 import { AppScriptModal } from './components/AppScriptModal';
 import { SettingsModal } from './components/SettingsModal';
+import { PasswordPromptModal } from './components/PasswordPromptModal';
 import { SuccessView } from './components/SuccessView';
 import { parseExcelFile } from './utils/excelParser';
 import { validateContactList } from './utils/validator';
@@ -32,7 +33,6 @@ import {
   DEFAULT_CAMPAIGN_TITLE,
   DEFAULT_FOLDER_ID,
   DEFAULT_APPS_SCRIPT_URL,
-  DEFAULT_FOLDER_URL,
   STEP2_TARGET_FOLDER_ID,
   DEFAULT_IMAGE_FOLDER_ID,
 } from './constants/appScriptCode';
@@ -79,8 +79,18 @@ export default function App() {
   // Modals & results
   const [isCodeModalOpen, setIsCodeModalOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [submitResult, setSubmitResult] = useState<SheetCreationResponse | null>(null);
   const [globalError, setGlobalError] = useState<string | null>(null);
+
+  const handleRequestOpenSettings = () => {
+    setIsPasswordModalOpen(true);
+  };
+
+  const handlePasswordSuccess = () => {
+    setIsPasswordModalOpen(false);
+    setIsSettingsOpen(true);
+  };
 
   // Load campaign history from Apps Script & localStorage
   const loadHistory = useCallback(async () => {
@@ -321,7 +331,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-slate-100/60 text-slate-900 font-sans flex flex-col selection:bg-emerald-100 selection:text-emerald-900">
       {/* Global Header */}
-      <Header onOpenSettings={() => setIsSettingsOpen(true)} />
+      <Header onOpenSettings={handleRequestOpenSettings} />
 
       {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -366,6 +376,11 @@ export default function App() {
               availableHeaders={availableHeaders}
               onRetry={() => handleExportContactList(lastExportFolderId || DEFAULT_IMAGE_FOLDER_ID)}
               onClientExportFallback={handleFallbackClientExport}
+              contacts={contacts}
+              rawRows={rawRows}
+              idKey={idKey}
+              step1SheetId={submitResult?.sheetId}
+              step1SheetUrl={submitResult?.sheetUrl}
             />
           </div>
         )}
@@ -410,7 +425,6 @@ export default function App() {
                     history={historyList}
                     isLoading={isHistoryLoading}
                     onRefresh={loadHistory}
-                    folderUrl={DEFAULT_FOLDER_URL}
                   />
                 )}
 
@@ -454,7 +468,7 @@ export default function App() {
                       onChangeTitle={setCampaignTitle}
                       onSubmit={handleSubmit}
                       isSubmitting={isSubmitting}
-                      onOpenSettings={() => setIsSettingsOpen(true)}
+                      onOpenSettings={handleRequestOpenSettings}
                       validCount={validCount}
                       totalCount={totalCount}
                     />
@@ -472,6 +486,14 @@ export default function App() {
           Contact List Creator &bull; Bước 1: Validate Excel (ID, Name, Email) &rarr; Bước 2: Quét ảnh Drive &rarr; Bước 3: Export Contact List kèm cột [img].
         </p>
       </footer>
+
+      {/* Password Prompt Modal for Settings */}
+      <PasswordPromptModal
+        isOpen={isPasswordModalOpen}
+        onClose={() => setIsPasswordModalOpen(false)}
+        onSuccess={handlePasswordSuccess}
+        correctPassword="201090"
+      />
 
       {/* Settings Modal */}
       <SettingsModal

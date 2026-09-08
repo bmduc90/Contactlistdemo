@@ -22,8 +22,8 @@ export function ColumnMapper({
       <div className="flex items-center justify-between gap-2 mb-3">
         <div className="flex items-center gap-2">
           <Columns3 className="w-4 h-4 text-slate-700" />
-          <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
-            Khớp cột dữ liệu
+          <h4 className="text-xs font-bold text-slate-900">
+            Khớp cột
           </h4>
         </div>
       </div>
